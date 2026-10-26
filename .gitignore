@@ -1,0 +1,6 @@
+/target
+.DS_Store
+.bgv
+.githooks/
+AGENTS.md
+CLAUDE.md
