@@ -53,7 +53,9 @@ fn rebuilt(bytes: Vec<u8>) -> Vec<u8> {
         block_bytes: 4096,
         restart_interval: 16,
         bloom_bits_per_key: 10,
+        filter: tessarikv_format::FilterPolicy::Bloom,
         compression: Compression::None,
+        prefix_length: None,
     };
     let mut builder = TableBuilder::new(options, compare_internal, user_key);
     let mut walk = table.iter();

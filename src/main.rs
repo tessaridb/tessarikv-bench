@@ -6,9 +6,12 @@ mod baseline;
 mod blockseek;
 mod compression;
 mod counting;
+mod cpu;
 mod engine;
 mod memwrite;
 mod reference;
+mod steady;
+mod writecurve;
 
 use std::hint::black_box;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -254,6 +257,17 @@ fn main() {
             .and_then(|value| value.parse().ok())
             .unwrap_or(1 << 20);
         reference::main(&root, keys);
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("steady") {
+        steady::main(&std::path::PathBuf::from(
+            args.get(2).expect("a directory for the runs"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("writecurve") {
+        let root = std::path::PathBuf::from(args.get(2).expect("a directory for the runs"));
+        writecurve::main(&root, args.get(3).map_or("buffered", String::as_str));
         return;
     }
     if args.get(1).map(String::as_str) == Some("engine") {

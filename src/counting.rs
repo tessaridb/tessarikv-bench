@@ -133,6 +133,21 @@ impl ReadableFile for CountingReader {
         }
         Ok(made)
     }
+    fn read_vec_at(&self, offset: u64, len: usize) -> Result<Vec<u8>> {
+        self.reads.add(Kind::Log, 1);
+        self.reads
+            .add(Kind::Tables, u64::try_from(len).unwrap_or(u64::MAX));
+        self.inner.read_vec_at(offset, len)
+    }
+    fn try_read_vec_at(&self, offset: u64, len: usize) -> Result<Option<Vec<u8>>> {
+        let made = self.inner.try_read_vec_at(offset, len)?;
+        if made.is_some() {
+            self.reads.add(Kind::Log, 1);
+            self.reads
+                .add(Kind::Tables, u64::try_from(len).unwrap_or(u64::MAX));
+        }
+        Ok(made)
+    }
     fn len(&self) -> Result<u64> {
         self.inner.len()
     }

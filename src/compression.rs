@@ -170,15 +170,21 @@ async fn run(root: &Path, name: &str, codec: Compression, keys: u64) {
     let written = storage.counters.read();
     let disk = tables_on_disk(&dir);
 
+    // The reads are counted only on request: the counting wrapper costs every file read two shared
+    // atomic additions, which the reference engine is not charged.
+    let count_reads = std::env::var_os("COUNT_READS").is_some();
     let counting = Arc::new(CountingStorage::default());
     let reads_counter = Arc::clone(&counting.reads);
     let storage: Arc<dyn Storage> = counting;
-    let db = Arc::new(
+    let db = Arc::new(if count_reads {
         Db::open_with_storage(&dir, options(codec), storage)
             .await
-            .expect("reopened"),
-    );
+            .expect("reopened")
+    } else {
+        Db::open(&dir, options(codec)).await.expect("reopened")
+    });
     let opened_reads = reads_counter.read();
+    let usage = crate::cpu::sample();
     let started = Instant::now();
     let mut tasks = tokio::task::JoinSet::new();
     for reader in 0..readers() {
@@ -208,12 +214,15 @@ async fn run(root: &Path, name: &str, codec: Compression, keys: u64) {
         latency.add(done.expect("a reader")).expect("same bounds");
     }
     let read_secs = started.elapsed().as_secs_f64();
-    let during = reads_counter.read().since(opened_reads);
-    eprintln!(
-        "file reads per get {:.3}, bytes per file read {:.0}",
-        float(during.log) / float(reads()),
-        float(during.tables) / float(during.log.max(1)),
-    );
+    crate::cpu::report(&usage, reads());
+    if count_reads {
+        let during = reads_counter.read().since(opened_reads);
+        eprintln!(
+            "file reads per get {:.3}, bytes per file read {:.0}",
+            float(during.log) / float(reads()),
+            float(during.tables) / float(during.log.max(1)),
+        );
+    }
     Arc::into_inner(db)
         .expect("readers done")
         .close()
