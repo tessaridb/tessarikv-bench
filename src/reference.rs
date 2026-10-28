@@ -99,6 +99,7 @@ pub fn main(root: &Path, keys: u64) {
         .map(|level| property(&db, &format!("rocksdb.num-files-at-level{level}")))
         .collect();
     eprintln!("files per level {levels:?}");
+    let usage = crate::cpu::sample();
     let started = Instant::now();
     let tasks: Vec<_> = (0..readers())
         .map(|reader| {
@@ -128,6 +129,7 @@ pub fn main(root: &Path, keys: u64) {
             .expect("same bounds");
     }
     let read_secs = started.elapsed().as_secs_f64();
+    crate::cpu::report(&usage, reads());
     let micros = |quantile| float(latency.value_at_quantile(quantile)) / 1e3;
     println!(
         "| reference | {:.0} | {:.1} | {:.1} | {:.1} |",

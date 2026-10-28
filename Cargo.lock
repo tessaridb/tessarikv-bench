@@ -813,9 +813,9 @@ dependencies = [
 
 [[package]]
 name = "tessarikv"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2ade23dfb53d30c5b5357832c8ba1df664f6303e2b53a01f587168d3aca2537"
+checksum = "9925bb1a65e36bb5c084f08b830c6b9bbbf74f00b48ab1641bba6a8826d766c3"
 dependencies = [
  "arc-swap",
  "papaya",
@@ -843,15 +843,15 @@ dependencies = [
 
 [[package]]
 name = "tessarikv-constants"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f87d2938862f09355602f90c2cd37fa9b9c83c2156686d1e1eca6ed18906a1b"
+checksum = "5536852b4dc002d57ab4d3401252fa803c5329a47624649a56ab91e0abc3c7c9"
 
 [[package]]
 name = "tessarikv-format"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61e385eb7a58a3b4a9317a4674fffbf6b9f588f9d469dc1f087352547031e115"
+checksum = "5a906666c84420a366e65a53bd353ca27bde1cdf943707ebe8447ad39f1ce516"
 dependencies = [
  "aes-gcm",
  "chacha20poly1305",
@@ -871,9 +871,9 @@ dependencies = [
 
 [[package]]
 name = "tessarikv-sync"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a76535e8464f550e98dc05c1a45e3722e26fd8dda1e450a2e6e461552efaa824"
+checksum = "371d4496b90be6e6f34b1608777aff65a6af448f8a210d074c7255ef0b24ae0b"
 dependencies = [
  "crossbeam-utils",
  "loom",
@@ -882,9 +882,9 @@ dependencies = [
 
 [[package]]
 name = "tessarikv-types"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa7ef829438123988583a3aa2b8a0fc130176710c0c66dce202e823b1a26262d"
+checksum = "1499566fe06c08c21b1ef0f34b89f2e90bf109fa733d3d78236abe01c75197bb"
 dependencies = [
  "tessarikv-constants",
  "thiserror",

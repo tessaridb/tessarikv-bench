@@ -11,10 +11,10 @@ homepage = "https://github.com/tessaridb/tessarikv-bench"
 publish = false
 
 [dependencies]
-tessarikv-sync = "0.1.1"
-tessarikv-format = "0.1.1"
-tessarikv = "0.1.1"
-tessarikv-types = "0.1.1"
+tessarikv-sync = "0.2.0"
+tessarikv-format = "0.2.0"
+tessarikv = "0.2.0"
+tessarikv-types = "0.2.0"
 tokio = { version = "1.53.3", default-features = false, features = ["rt-multi-thread", "time"] }
 hdrhistogram = { version = "7.5.4", default-features = false }
 rocksdb = { version = "0.25.0", default-features = false, features = ["bindgen-runtime", "lz4"] }

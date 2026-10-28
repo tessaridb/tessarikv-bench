@@ -30,6 +30,8 @@ crate builds C++.
 | `tessarikv-bench engine <dir> [keys] [style-writers]` | Write amplification and write throughput per compaction style (leveled, universal, FIFO) and writer count: a random fill, then as many uniform-random overwrites. Every byte the engine appends is counted by file kind. Default 2 Mi keys; `leveled-4` runs one case. |
 | `tessarikv-bench compression <dir> [keys] [codec]` | Table compression per codec (none, LZ4, Snappy, Zstandard, Deflate 1/6/9): on-disk ratio, write throughput and amplification, then point-read latency after a reopen with a small block cache. Default 1 Mi keys. |
 | `tessarikv-bench reference <dir> [keys]` | RocksDB on the `compression` workload: the same keys and records from four writers, then uniform-random point reads after a reopen and a drained compaction backlog. Default 1 Mi keys; `CODEC=lz4` compresses every level. |
+| `tessarikv-bench writecurve <dir> <sync\|buffered>` | Single-put writes on both engines as a curve over writer counts at one durability level: fresh random keys with records of about 200 bytes for a fixed time into a new database, the engines alternating run by run. `WRITERS` (1,2,4,8,16), `MILLIS` per run (3000) and `RUNS` per point (3) override the shape. |
+| `tessarikv-bench steady <dir>` | Both engines at steady state: each is filled once (`KEYS`, default 1 000 000 records of about 200 bytes), flushed and left until compaction settles, then measured with single-put overwrites over writer counts (buffered on both sides) and iterator scans of `SCAN` entries over reader counts. `WRITERS`, `READERS`, `SCAN`, `MILLIS` and `RUNS` override the shape. |
 | `tessarikv-bench memwrite [writes] [rounds]` | The commit path alone: writers committing single-put batches into an in-memory database with no log. Default 1 000 000 writes, 5 rounds. |
 | `tessarikv-bench blockseek <file> [seeks]` | The CPU of index and data-block search in one table file held in memory, with no checksum, copy, storage or runtime around it. Default 2 000 000 seeks; `REBUILD=1` writes the table again with this build's builder first. |
 
@@ -39,10 +41,15 @@ left behind. `READERS`, `READS` and
 `CACHE_MIB` override the reader count (4), the point reads per run (400 000) and the block cache (8 MiB) of the
 `compression` mode.
 
+The point-read runs of `compression` and `reference` also print the process CPU per read (user + system), the
+system share, and minor faults and context switches per read. `COUNT_READS=1` additionally counts the file reads
+TessariKV makes per point read; it is off by default because the counting wrapper adds two shared atomic
+additions to every file read, a cost the reference engine is not charged.
+
 ### Durability
 
-Write modes use buffered durability on both engines: every write goes through the log, which is handed to the OS
-and not synced (`Durability::Buffered` in TessariKV, `set_sync(false)` in RocksDB). A comparison at different
+Write modes use buffered durability on both engines unless the mode takes the level as an argument (`writecurve`):
+every write goes through the log, which is handed to the OS and not synced (`Durability::Buffered` in TessariKV, `set_sync(false)` in RocksDB). A comparison at different
 durability levels measures the durability gap rather than the engine, so the level is stated beside every result.
 
 ## Building
@@ -53,7 +60,7 @@ cargo build --release
 ```
 
 Rust 1.89 or later, plus a C++ toolchain and `libclang` for the `rocksdb` crate. The engine crates come from
-[crates.io](https://crates.io/crates/tessarikv) at `0.1.1`.
+[crates.io](https://crates.io/crates/tessarikv) at `0.2.0`.
 
 ## Reading a result
 
